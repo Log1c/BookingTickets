@@ -10,6 +10,7 @@ import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +30,7 @@ public class DefaultTicketServiceTest {
     @Test
     public void getBookedTickets() {
         ticketService.addTicket(createTicket());
-        ticketService.bookTicket(createBookTicket());
+        ticketService.bookTickets("u1", Arrays.asList("0"));
         assertEquals(ticketService.getBookedTickets().size(), 1);
     }
 

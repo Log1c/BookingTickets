@@ -69,31 +69,15 @@ class DefaultTicketService implements TicketService {
     }
 
     @Override
-    public Optional<BookedTicket> bookTicket(BookedTicket bookedTicket) {
-        Optional<Ticket> ticket = tickets.stream().filter(t -> t.getId().equals(bookedTicket.getId())).findFirst();
-        if (!ticket.isPresent()) {
-            System.out.println("try to book nonexistent ticket");//TODO into Exception
-            return Optional.empty();
-        }
-
-        bookedTickets.add(bookedTicket);
-
-        return Optional.of(bookedTicket);
-    }
-
-    @Override
-    public Collection<BookedTicket> bookTickets(Collection<BookedTicket> bookedTickets) {
+    public List<BookedTicket> bookTickets(String userId, Collection<String> ticketsIds) {
         //TODO adding check on existence tickets
-//        Set<String> set = bookedTickets.stream()
-//                .map(b -> b.getId())
-//                .collect(Collectors.toSet());
-//
-//        Optional<Ticket> ticket = tickets.stream()
-//                .filter(t -> set.contains(t.getId()))
-//                .findFirst();
 
-        bookedTickets.addAll(bookedTickets);
+        List<BookedTicket> result = ticketsIds.stream()
+                .map(b -> new BookedTicket(b, userId))
+                .collect(Collectors.toList());
 
-        return bookedTickets;
+        bookedTickets.addAll(result);
+
+        return result;
     }
 }
