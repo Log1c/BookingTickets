@@ -1,4 +1,16 @@
 package ua.logic.bookingTicket.repository;
 
-//public interface TicketRepository extends PagingAndSortingRepository<Ticket, Long> {
-//}
+import org.springframework.stereotype.Repository;
+import ua.logic.bookingTicket.entity.Ticket;
+
+import java.util.Collection;
+import java.util.Optional;
+
+@Repository
+public interface TicketRepository {
+    Optional<Ticket> findOne(String id);
+
+    Collection<Ticket> findAll();
+
+    Ticket save(Ticket ticket);
+}

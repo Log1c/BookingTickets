@@ -28,10 +28,29 @@ public class DefaultTicketServiceTest {
     }
 
     @Test
-    public void getBookedTickets() {
+    public void getBookedTicketsWithoutFilter() {
         ticketService.addTicket(createTicket());
-        ticketService.bookTickets("u1", Arrays.asList("0"));
-        assertEquals(ticketService.getBookedTickets().size(), 1);
+        String userId = "u1";
+        ticketService.bookTickets(userId, Arrays.asList("0"));
+        assertEquals(1, ticketService.getBookedTickets(userId, new TicketFilter.Builder().build()).size());
+    }
+
+    @Test
+    public void getBookedTicketsWithFilterWithoutResult() {
+        ticketService.addTicket(createTicket());
+        String userId = "u1";
+        ticketService.bookTickets(userId, Arrays.asList("0"));
+        TicketFilter.Builder builder = new TicketFilter.Builder().id("1");
+        assertEquals(0, ticketService.getBookedTickets(userId, builder.build()).size());
+    }
+
+    @Test
+    public void getBookedTicketsWithFilterWithResult() {
+        ticketService.addTicket(createTicket());
+        String userId = "u1";
+        ticketService.bookTickets(userId, Arrays.asList("0"));
+        TicketFilter.Builder builder = new TicketFilter.Builder().id("0");
+        assertEquals(1, ticketService.getBookedTickets(userId, builder.build()).size());
     }
 
     private Ticket createTicket() {

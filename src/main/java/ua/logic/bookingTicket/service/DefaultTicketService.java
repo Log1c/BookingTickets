@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
+import ua.logic.bookingTicket.repository.BookedTicketRepository;
+import ua.logic.bookingTicket.repository.TicketRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,32 +13,46 @@ import java.util.stream.Stream;
 
 @Service
 class DefaultTicketService implements TicketService {
-    private Set<Ticket> tickets = new HashSet<>();
-    private Set<BookedTicket> bookedTickets = new HashSet<>();
+    private final TicketRepository ticketRepository;
+    private final BookedTicketRepository bookedTicketRepository;
 
-    @Override
-    public Collection<Ticket> getTickets() {
-        return Collections.unmodifiableCollection(tickets);
+    DefaultTicketService(TicketRepository ticketRepository,
+                         BookedTicketRepository bookedTicketRepository) {
+        this.ticketRepository = ticketRepository;
+        this.bookedTicketRepository = bookedTicketRepository;
     }
 
     @Override
-    public Ticket getTicket(String id) {
-        return tickets.stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst().get();
+    public Collection<Ticket> getTickets() {
+        return ticketRepository.findAll();
+    }
+
+    @Override
+    public Optional<Ticket> getTicket(String id) {
+        return ticketRepository.findOne(id);
     }
 
     @Override
     public Collection<Ticket> getAvailableTickets(TicketFilter filter) {
-        Set<String> collect = bookedTickets.stream()
-                .map(b -> b.getId())
+        Set<String> ids = bookedTicketRepository.findAll().stream()
+                .map(BookedTicket::getId)
                 .collect(Collectors.toSet());
 
-        Set<Ticket> tickets = this.tickets.stream()
-                .filter(t -> !collect.contains(t.getId()))
+        Set<Ticket> tickets = ticketRepository.findAll().stream()
+                .filter(t -> !ids.contains(t.getId()))
                 .collect(Collectors.toSet());
 
+        Stream<Ticket> stream = getTicketFilter(tickets, filter);
+
+        return stream.collect(Collectors.toList());
+    }
+
+    private Stream<Ticket> getTicketFilter(Set<Ticket> tickets, TicketFilter filter) {
         Stream<Ticket> stream = tickets.stream();
+        if (filter.getId().isPresent()) {
+            stream = stream.filter(t -> t.getId().contains(filter.getId().get()));
+        }
+
         if (filter.getTitle().isPresent()) {
             stream = stream.filter(t -> t.getTitle().contains(filter.getTitle().get()));
         }
@@ -53,17 +69,35 @@ class DefaultTicketService implements TicketService {
             stream = stream.filter(t -> t.getDate().equals(filter.getDate().get()));
         }
 
-        return stream.collect(Collectors.toList());
+        return stream;
     }
 
     @Override
-    public Collection<BookedTicket> getBookedTickets() {
-        return new HashSet<>(bookedTickets);
+    public Collection<BookedTicket> getBookedTickets(String userId, TicketFilter filter) {
+        Set<String> bookedTicketsIds = bookedTicketRepository.findAll().stream()
+                .map(b -> b.getId())
+                .collect(Collectors.toSet());
+
+        Set<Ticket> tickets = ticketRepository.findAll().stream()
+                .filter(t -> bookedTicketsIds.contains(t.getId()))
+                .collect(Collectors.toSet());
+
+        Stream<Ticket> filteredTickets = getTicketFilter(tickets, filter);
+
+        Set<String> filteredTicketIds = filteredTickets.map(t -> t.getId())
+                .collect(Collectors.toSet());
+
+        return bookedTicketRepository.findAll().stream()
+                .filter(b -> filteredTicketIds.contains(b.getId()))
+                .filter(b -> b.getUserId().equals(userId))
+                .collect(Collectors.toSet());
+
+//        return new HashSet<>(bookedTickets);
     }
 
     @Override
     public Ticket addTicket(Ticket ticket) {
-        tickets.add(ticket);
+        ticketRepository.save(ticket);
 
         return ticket;
     }
@@ -76,7 +110,7 @@ class DefaultTicketService implements TicketService {
                 .map(b -> new BookedTicket(b, userId))
                 .collect(Collectors.toList());
 
-        bookedTickets.addAll(result);
+        bookedTicketRepository.save(result);
 
         return result;
     }

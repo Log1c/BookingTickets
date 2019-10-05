@@ -26,15 +26,15 @@ public class TicketController {
 
     @GetMapping("/{id}")
     public Ticket getTickets(@PathVariable("id") String id) {
-        return ticketService.getTicket(id);
+        return ticketService.getTicket(id).get();//TODO add exception
     }
 
     @GetMapping("/available")
     public Collection<Ticket> getAvailableTickets(
             @RequestParam(name = "title", required = false) String title
-            , @RequestParam(name="place", required = false) Integer place
-            , @RequestParam(name="category", required = false) TicketCategory category
-            , @RequestParam(name="date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date) {
+            , @RequestParam(name = "place", required = false) Integer place
+            , @RequestParam(name = "category", required = false) TicketCategory category
+            , @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
 
         TicketFilter.Builder builder = new TicketFilter.Builder()
                 .title(title)

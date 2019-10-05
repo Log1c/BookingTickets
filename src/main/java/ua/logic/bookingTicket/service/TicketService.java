@@ -7,6 +7,7 @@ import ua.logic.bookingTicket.entity.Ticket;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface TicketService {
@@ -14,11 +15,11 @@ public interface TicketService {
 
     Ticket addTicket(Ticket ticket);
 
-    Ticket getTicket(String id);
+    Optional<Ticket> getTicket(String id);
 
     Collection<Ticket> getAvailableTickets(TicketFilter filter);
 
-    Collection<BookedTicket> getBookedTickets();
+    Collection<BookedTicket> getBookedTickets(String userId, TicketFilter filter);
 
     List<BookedTicket> bookTickets(String userId, Collection<String> bookedTickets);
 }
