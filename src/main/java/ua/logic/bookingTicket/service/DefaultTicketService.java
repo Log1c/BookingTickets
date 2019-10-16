@@ -81,7 +81,7 @@ class DefaultTicketService implements TicketService {
     @Override
     public Collection<BookedTicket> getBookedTickets(String userId, TicketFilter filter) {
         Set<String> bookedTicketsIds = bookedTicketRepository.findAll().stream()
-                .map(b -> b.getId())
+                .map(BookedTicket::getId)
                 .collect(Collectors.toSet());
 
         Set<Ticket> tickets = ticketRepository.findAll().stream()
@@ -90,7 +90,7 @@ class DefaultTicketService implements TicketService {
 
         Stream<Ticket> filteredTickets = getTicketFilter(tickets, filter);
 
-        Set<String> filteredTicketIds = filteredTickets.map(t -> t.getId())
+        Set<String> filteredTicketIds = filteredTickets.map(Ticket::getId)
                 .collect(Collectors.toSet());
 
         return bookedTicketRepository.findAll().stream()
@@ -101,9 +101,7 @@ class DefaultTicketService implements TicketService {
 
     @Override
     public Ticket addTicket(Ticket ticket) {
-        ticketRepository.save(ticket);
-
-        return ticket;
+        return ticketRepository.save(ticket);
     }
 
     @Override

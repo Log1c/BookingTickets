@@ -1,7 +1,11 @@
 package ua.logic.bookingTicket.controller;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.logic.bookingTicket.PdfGenerator;
 import ua.logic.bookingTicket.TicketCategory;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.Ticket;
@@ -9,6 +13,7 @@ import ua.logic.bookingTicket.exception.TicketNotFoundException;
 import ua.logic.bookingTicket.service.TicketService;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
@@ -26,12 +31,27 @@ public class TicketController {
         return ticketService.getTickets();
     }
 
+    @GetMapping(value = "/" + PdfGenerator.PDF_FORMAT_STRING, produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<InputStreamResource> getTicketsInPdf() {
+        Collection<Ticket> tickets = ticketService.getTickets();
+
+        return PdfGenerator.ticket(tickets);
+    }
+
     @GetMapping("/{id}")
     public Ticket getTickets(@PathVariable("id") String id) {
         Optional<Ticket> ticket = ticketService.getTicket(id);
         ticket.orElseThrow(() -> new TicketNotFoundException(id));
 
         return ticket.get();
+    }
+
+    @GetMapping(value = "/{id}/" + PdfGenerator.PDF_FORMAT_STRING, produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<InputStreamResource> getTicketsInPdf(@PathVariable("id") String id) {
+        Optional<Ticket> ticket = ticketService.getTicket(id);
+        ticket.orElseThrow(() -> new TicketNotFoundException(id));
+
+        return PdfGenerator.ticket(Collections.singleton(ticket.get()));
     }
 
     @GetMapping("/available")

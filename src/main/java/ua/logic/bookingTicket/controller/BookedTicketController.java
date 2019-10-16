@@ -2,7 +2,6 @@ package ua.logic.bookingTicket.controller;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,7 +12,6 @@ import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.service.TicketService;
 
-import java.io.ByteArrayInputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -21,8 +19,6 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/bookedTickets")
 public class BookedTicketController {
-    private static final String PDF_FORMAT_STRING = "pdf";
-
     private final TicketService ticketService;
 
     public BookedTicketController(TicketService ticketService) {
@@ -47,7 +43,7 @@ public class BookedTicketController {
         return ticketService.getBookedTickets(userId, builder.build());
     }
 
-    @GetMapping("/" + PDF_FORMAT_STRING)
+    @GetMapping("/" + PdfGenerator.PDF_FORMAT_STRING)
     public ResponseEntity<InputStreamResource> getBookedTicketsAndReturnPdf(
             @RequestParam(name = "userId") String userId
             , @RequestParam(name = "title", required = false) String title
@@ -63,16 +59,7 @@ public class BookedTicketController {
 
         Collection<BookedTicket> bookedTickets = ticketService.getBookedTickets(userId, builder.build());
 
-        ByteArrayInputStream ticketStream = PdfGenerator.bookedTickets(bookedTickets);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=ticket.pdf");
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(ticketStream));
+        return PdfGenerator.bookedTickets(bookedTickets);
     }
 
     @PutMapping("/book/{userId}")
@@ -81,19 +68,11 @@ public class BookedTicketController {
         return ticketService.bookTickets(userId, ticketIds);
     }
 
-    @PutMapping(value = "/book/{userId}/"+ PDF_FORMAT_STRING, produces = MediaType.APPLICATION_PDF_VALUE)
+    @PutMapping(value = "/book/{userId}/" + PdfGenerator.PDF_FORMAT_STRING, produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> bookTicketAndReturnPdf(@PathVariable("userId") String userId, @RequestBody List<String> ticketIds) {
         List<BookedTicket> bookedTickets = ticketService.bookTickets(userId, ticketIds);
 
-        ByteArrayInputStream ticketStream = PdfGenerator.bookedTickets(bookedTickets);
+        return PdfGenerator.bookedTickets(bookedTickets);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=ticket.pdf");
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(ticketStream));
     }
 }

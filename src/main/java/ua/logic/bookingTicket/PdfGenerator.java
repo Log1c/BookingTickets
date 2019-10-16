@@ -6,6 +6,10 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
 import ua.logic.bookingTicket.exception.PdfGeneratorUnattainableException;
@@ -15,7 +19,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 
 public class PdfGenerator {
-    public static ByteArrayInputStream ticket(Collection<Ticket> tickets) {
+    public static final String PDF_FORMAT_STRING = "pdf";
+
+    public static ResponseEntity<InputStreamResource> ticket(Collection<Ticket> tickets) {
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -49,10 +55,10 @@ public class PdfGenerator {
             document.close();
         }
 
-        return new ByteArrayInputStream(out.toByteArray());
+        return getResponse(new ByteArrayInputStream(out.toByteArray()));
     }
 
-    public static ByteArrayInputStream bookedTickets(Collection<BookedTicket> bookedTickets) {
+    public static ResponseEntity<InputStreamResource> bookedTickets(Collection<BookedTicket> bookedTickets) {
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -75,7 +81,7 @@ public class PdfGenerator {
                 table.addCell(new PdfPCell(new Phrase("place")));
                 table.addCell(new PdfPCell(new Phrase(ticket.getPlace().toString())));
 
-                table.addCell(new PdfPCell(new Phrase("place")));
+                table.addCell(new PdfPCell(new Phrase("userId")));
                 table.addCell(new PdfPCell(new Phrase(bookedTicket.getUserId())));
 
                 table.addCell("");
@@ -91,6 +97,18 @@ public class PdfGenerator {
             document.close();
         }
 
-        return new ByteArrayInputStream(out.toByteArray());
+        return getResponse(new ByteArrayInputStream(out.toByteArray()));
     }
+
+    private static ResponseEntity<InputStreamResource> getResponse(ByteArrayInputStream stream){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=ticket.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(stream));
+    }
+
 }
