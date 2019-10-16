@@ -12,5 +12,7 @@ public interface TicketRepository {
 
     Collection<Ticket> findAll();
 
+    Collection<Ticket> findAll(Collection<String> ids);
+
     Ticket save(Ticket ticket);
 }

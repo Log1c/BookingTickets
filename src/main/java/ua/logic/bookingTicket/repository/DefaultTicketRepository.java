@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import ua.logic.bookingTicket.entity.Ticket;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 class DefaultTicketRepository implements TicketRepository {
@@ -19,6 +20,13 @@ class DefaultTicketRepository implements TicketRepository {
     @Override
     public Collection<Ticket> findAll() {
         return Collections.unmodifiableCollection(tickets);
+    }
+
+    @Override
+    public Collection<Ticket> findAll(Collection<String> ids) {
+        return tickets.stream()
+                .filter(t -> ids.contains(t.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override

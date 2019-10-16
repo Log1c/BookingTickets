@@ -17,6 +17,8 @@ public interface TicketService {
 
     Optional<Ticket> getTicket(String id);
 
+    Collection<Ticket> getTickets(Collection<String> ids);
+
     Collection<Ticket> getAvailableTickets(TicketFilter filter);
 
     Collection<BookedTicket> getBookedTickets(String userId, TicketFilter filter);

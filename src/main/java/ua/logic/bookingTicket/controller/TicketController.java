@@ -5,10 +5,12 @@ import org.springframework.web.bind.annotation.*;
 import ua.logic.bookingTicket.TicketCategory;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.Ticket;
+import ua.logic.bookingTicket.exception.TicketNotFoundException;
 import ua.logic.bookingTicket.service.TicketService;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/tickets")
@@ -26,7 +28,10 @@ public class TicketController {
 
     @GetMapping("/{id}")
     public Ticket getTickets(@PathVariable("id") String id) {
-        return ticketService.getTicket(id).get();//TODO add exception
+        Optional<Ticket> ticket = ticketService.getTicket(id);
+        ticket.orElseThrow(() -> new TicketNotFoundException(id));
+
+        return ticket.get();
     }
 
     @GetMapping("/available")

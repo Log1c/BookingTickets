@@ -58,6 +58,6 @@ public class DefaultTicketServiceTest {
     }
 
     private BookedTicket createBookTicket() {
-        return new BookedTicket("0", "u1");
+        return new BookedTicket("0", "u1", createTicket());
     }
 }

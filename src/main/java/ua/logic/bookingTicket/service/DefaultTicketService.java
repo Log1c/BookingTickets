@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
+import ua.logic.bookingTicket.exception.TicketNotFoundException;
 import ua.logic.bookingTicket.repository.BookedTicketRepository;
 import ua.logic.bookingTicket.repository.TicketRepository;
 
@@ -30,6 +31,11 @@ class DefaultTicketService implements TicketService {
     @Override
     public Optional<Ticket> getTicket(String id) {
         return ticketRepository.findOne(id);
+    }
+
+    @Override
+    public Collection<Ticket> getTickets(Collection<String> ids) {
+        return ticketRepository.findAll(ids);
     }
 
     @Override
@@ -91,8 +97,6 @@ class DefaultTicketService implements TicketService {
                 .filter(b -> filteredTicketIds.contains(b.getId()))
                 .filter(b -> b.getUserId().equals(userId))
                 .collect(Collectors.toSet());
-
-//        return new HashSet<>(bookedTickets);
     }
 
     @Override
@@ -104,10 +108,14 @@ class DefaultTicketService implements TicketService {
 
     @Override
     public List<BookedTicket> bookTickets(String userId, Collection<String> ticketsIds) {
-        //TODO adding check on existence tickets
+        Collection<Ticket> tickets = getTickets(ticketsIds);
 
-        List<BookedTicket> result = ticketsIds.stream()
-                .map(b -> new BookedTicket(b, userId))
+        if (tickets.size() != ticketsIds.size()) {
+            new TicketNotFoundException(ticketsIds);
+        }
+
+        List<BookedTicket> result = tickets.stream()
+                .map(b -> new BookedTicket(b.getId(), userId, b))
                 .collect(Collectors.toList());
 
         bookedTicketRepository.save(result);
