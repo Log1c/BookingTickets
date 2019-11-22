@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public interface TicketRepository extends CrudRepository<Ticket, Long> {
+public interface TicketRepository {
     Optional<Ticket> findOne(String id);
 
     Collection<Ticket> findAll();

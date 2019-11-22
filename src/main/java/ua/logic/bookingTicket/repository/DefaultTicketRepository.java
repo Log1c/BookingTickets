@@ -1,14 +1,21 @@
 package ua.logic.bookingTicket.repository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ua.logic.bookingTicket.entity.Ticket;
+import ua.logic.bookingTicket.repository.rowMappers.TicketRowMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 class DefaultTicketRepository implements TicketRepository {
-    private Set<Ticket> tickets = new HashSet<>();
+    private final JdbcTemplate jdbcTemplate;
+
+    public DefaultTicketRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Optional<Ticket> findOne(String id) {
@@ -19,7 +26,7 @@ class DefaultTicketRepository implements TicketRepository {
 
     @Override
     public Collection<Ticket> findAll() {
-        return Collections.unmodifiableCollection(tickets);
+        return jdbcTemplate.query("SELECT * FROM ticket", new TicketRowMapper());
     }
 
     @Override
