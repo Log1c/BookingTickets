@@ -14,8 +14,7 @@ public class TicketRowMapper implements RowMapper<Ticket> {
                 resultSet.getString("id"),
                 resultSet.getString("title"),
                 resultSet.getDate("date"),
-                TicketCategory.STANDARD,
-//                resultSet.getString("ticketCategory"), //todo try to fix
+                TicketCategory.valueOf(resultSet.getString("category")),
                 resultSet.getInt("place")
         );
     }

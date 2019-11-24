@@ -1,5 +1,6 @@
 package ua.logic.bookingTicket.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +23,13 @@ class DefaultTicketRepository implements TicketRepository {
     @Override
     @Transactional(readOnly=true)
     public Optional<Ticket> findOne(String id) {
-        Ticket ticket = jdbcTemplate.queryForObject(
-                "SELECT * FROM ticket WHERE id=?",
-                new Object[]{id}, new TicketRowMapper());
-
-        if (ticket == null) {
+        try {//TODO be out of catch Exception
+            return Optional.of(jdbcTemplate.queryForObject(
+                    "SELECT * FROM ticket WHERE id=?",
+                    new Object[]{id}, new TicketRowMapper()));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
             return Optional.empty();
         }
-
-        return Optional.of(ticket);
     }
 
     @Override
@@ -63,7 +62,7 @@ class DefaultTicketRepository implements TicketRepository {
     private Ticket create(Ticket ticket) {
         jdbcTemplate.update(
                 "INSERT INTO ticket (id, title, date, category, place) values(?,?,?,?,?)",
-                ticket.getId(), ticket.getTitle(), ticket.getDate(), ticket.getCategory(), ticket.getPlace());
+                ticket.getId(), ticket.getTitle(), ticket.getDate(), ticket.getCategory().toString(), ticket.getPlace());
 
         return ticket;
     }

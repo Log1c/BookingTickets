@@ -2,9 +2,9 @@
 CREATE TABLE ticket
 (
     id VARCHAR(7) NOT NULL,
-    title VARCHAR(7),
-    date DATE, --maybe wrong
-    ticketCategory VARCHAR(7), --todo wrong
+    title VARCHAR(50),
+    date DATE,
+    category ENUM('STANDARD', 'PREMIUM', 'BAR'),
     place INT,
     PRIMARY KEY (id)
 );

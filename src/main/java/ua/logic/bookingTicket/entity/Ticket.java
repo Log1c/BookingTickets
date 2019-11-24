@@ -1,12 +1,12 @@
 package ua.logic.bookingTicket.entity;
 
-import org.springframework.data.annotation.Id;
+//import org.springframework.data.annotation.Id;
 import ua.logic.bookingTicket.TicketCategory;
 
 import java.util.Date;
 
 public class Ticket {
-    @Id
+//    @Id
     private final String id;
     private String title;
     private Date date;    // Date when this film is demonstrated
