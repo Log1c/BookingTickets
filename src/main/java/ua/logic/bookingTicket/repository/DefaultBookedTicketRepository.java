@@ -1,25 +1,39 @@
 package ua.logic.bookingTicket.repository;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ua.logic.bookingTicket.entity.BookedTicket;
+import ua.logic.bookingTicket.repository.rowMappers.BookedTicketRowMapper;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 @Repository
-//TODO change it on jdbcTemplate
-public class DefaultBookedTicketRepository implements BookedTicketRepository{
-    private Set<BookedTicket> bookedTickets = new HashSet<>();
+public class DefaultBookedTicketRepository implements BookedTicketRepository {
+    private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    public Collection<BookedTicket> findAll() {
-        return Collections.unmodifiableCollection(bookedTickets);
+    public DefaultBookedTicketRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Collection<BookedTicket> findAll() {
+        return jdbcTemplate.query("SELECT * FROM bookedTicket", new BookedTicketRowMapper());
+    }
+
+    @Override
+    //without update
+    @Transactional
     public void save(Collection<BookedTicket> bookedTickets) {
-        this.bookedTickets.addAll(bookedTickets);
+        bookedTickets.forEach(this::create);
+    }
+
+    private BookedTicket create(BookedTicket bookedTicket) {
+        jdbcTemplate.update(
+                "INSERT INTO bookedTicket (bookedTicketId, userId, ticketId) values(?,?,?)",
+                bookedTicket.getId(), bookedTicket.getUserId(), bookedTicket.getTicketId());
+
+        return bookedTicket;
     }
 }

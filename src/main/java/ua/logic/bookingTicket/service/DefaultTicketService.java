@@ -113,7 +113,7 @@ class DefaultTicketService implements TicketService {
         }
 
         List<BookedTicket> result = tickets.stream()
-                .map(b -> new BookedTicket(b.getId(), userId, b))
+                .map(b -> new BookedTicket(b.getId(), userId, b.getId()))
                 .collect(Collectors.toList());
 
         bookedTicketRepository.save(result);

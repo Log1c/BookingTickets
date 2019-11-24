@@ -57,7 +57,7 @@ public class DefaultTicketServiceTest {
         return new Ticket("0", "A Beautiful Mind", new Date(), TicketCategory.STANDARD, 1);
     }
 
-    private BookedTicket createBookTicket() {
-        return new BookedTicket("0", "u1", createTicket());
-    }
+//    private BookedTicket createBookTicket() {
+//        return new BookedTicket("0", "u1", createTicket());
+//    }
 }

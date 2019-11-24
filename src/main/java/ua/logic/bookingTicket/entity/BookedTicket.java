@@ -3,12 +3,12 @@ package ua.logic.bookingTicket.entity;
 public class BookedTicket {
     private final String bookedTicketId;
     private final String userId;
-    private final Ticket ticket;
+    private final String ticketId;
 
-    public BookedTicket(String bookedTicketId, String userId, Ticket ticket) {
+    public BookedTicket(String bookedTicketId, String userId, String ticketId) {
         this.bookedTicketId = bookedTicketId;
         this.userId = userId;
-        this.ticket = ticket;
+        this.ticketId = ticketId;
     }
 
     public String getId() {
@@ -19,7 +19,7 @@ public class BookedTicket {
         return userId;
     }
 
-    public Ticket getTicket() {
-        return ticket;
+    public String getTicketId() {
+        return ticketId;
     }
 }

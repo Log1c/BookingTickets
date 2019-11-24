@@ -1,4 +1,4 @@
-package ua.logic.bookingTicket;
+package ua.logic.bookingTicket.service;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -10,18 +10,28 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
 import ua.logic.bookingTicket.exception.PdfGeneratorUnattainableException;
+import ua.logic.bookingTicket.repository.TicketRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
+import java.util.Optional;
 
+@Service
 public class PdfGenerator {
     public static final String PDF_FORMAT_STRING = "pdf";
 
-    public static ResponseEntity<InputStreamResource> ticket(Collection<Ticket> tickets) {
+    private final TicketRepository ticketRepository;
+
+    public PdfGenerator(TicketRepository ticketRepository) {
+        this.ticketRepository = ticketRepository;
+    }
+
+    public ResponseEntity<InputStreamResource> ticket(Collection<Ticket> tickets) {
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -58,14 +68,19 @@ public class PdfGenerator {
         return getResponse(new ByteArrayInputStream(out.toByteArray()));
     }
 
-    public static ResponseEntity<InputStreamResource> bookedTickets(Collection<BookedTicket> bookedTickets) {
+    public ResponseEntity<InputStreamResource> bookedTickets(Collection<BookedTicket> bookedTickets) {
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
             PdfPTable table = new PdfPTable(2);
             for (BookedTicket bookedTicket : bookedTickets) {
-                Ticket ticket = bookedTicket.getTicket();
+                //TODO change it for performance
+                Optional<Ticket> one = ticketRepository.findOne(bookedTicket.getTicketId());
+                if (!one.isPresent()) {
+                    continue;
+                }
+                Ticket ticket = one.get();
                 table.addCell(new PdfPCell(new Phrase("id")));
                 table.addCell(new PdfPCell(new Phrase(ticket.getId())));
 
@@ -100,7 +115,7 @@ public class PdfGenerator {
         return getResponse(new ByteArrayInputStream(out.toByteArray()));
     }
 
-    private static ResponseEntity<InputStreamResource> getResponse(ByteArrayInputStream stream){
+    private ResponseEntity<InputStreamResource> getResponse(ByteArrayInputStream stream){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=ticket.pdf");
 

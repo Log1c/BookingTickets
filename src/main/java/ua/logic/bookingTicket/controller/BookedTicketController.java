@@ -6,7 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ua.logic.bookingTicket.PdfGenerator;
+import ua.logic.bookingTicket.service.PdfGenerator;
 import ua.logic.bookingTicket.TicketCategory;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
@@ -20,9 +20,11 @@ import java.util.List;
 @RequestMapping(value = "/bookedTickets")
 public class BookedTicketController {
     private final TicketService ticketService;
+    private final PdfGenerator pdfGenerator;
 
-    public BookedTicketController(TicketService ticketService) {
+    public BookedTicketController(TicketService ticketService, PdfGenerator pdfGenerator) {
         this.ticketService = ticketService;
+        this.pdfGenerator = pdfGenerator;
     }
 
     @GetMapping
@@ -59,7 +61,7 @@ public class BookedTicketController {
 
         Collection<BookedTicket> bookedTickets = ticketService.getBookedTickets(userId, builder.build());
 
-        return PdfGenerator.bookedTickets(bookedTickets);
+        return pdfGenerator.bookedTickets(bookedTickets);
     }
 
     @PutMapping("/book/{userId}")
@@ -72,7 +74,7 @@ public class BookedTicketController {
     public ResponseEntity<InputStreamResource> bookTicketAndReturnPdf(@PathVariable("userId") String userId, @RequestBody List<String> ticketIds) {
         List<BookedTicket> bookedTickets = ticketService.bookTickets(userId, ticketIds);
 
-        return PdfGenerator.bookedTickets(bookedTickets);
+        return pdfGenerator.bookedTickets(bookedTickets);
 
     }
 }

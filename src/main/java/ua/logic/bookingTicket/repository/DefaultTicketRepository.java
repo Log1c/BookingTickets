@@ -9,6 +9,7 @@ import ua.logic.bookingTicket.repository.rowMappers.TicketRowMapper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,25 +22,25 @@ class DefaultTicketRepository implements TicketRepository {
     }
 
     @Override
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public Optional<Ticket> findOne(String id) {
         try {//TODO be out of catch Exception
-            return Optional.of(jdbcTemplate.queryForObject(
+            return Optional.of(Objects.requireNonNull(jdbcTemplate.queryForObject(
                     "SELECT * FROM ticket WHERE id=?",
-                    new Object[]{id}, new TicketRowMapper()));
+                    new Object[]{id}, new TicketRowMapper())));
         } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
             return Optional.empty();
         }
     }
 
     @Override
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public Collection<Ticket> findAll() {
         return jdbcTemplate.query("SELECT * FROM ticket", new TicketRowMapper());
     }
 
     @Override
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public Collection<Ticket> findAll(Collection<String> ids) {
         List<Ticket> tickets = jdbcTemplate.query("SELECT * FROM ticket", new TicketRowMapper());
 
@@ -49,6 +50,7 @@ class DefaultTicketRepository implements TicketRepository {
     }
 
     @Override
+    @Transactional
     public Ticket save(Ticket ticket) {
         Optional<Ticket> one = findOne(ticket.getId());
 

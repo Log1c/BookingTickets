@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.logic.bookingTicket.PdfGenerator;
+import ua.logic.bookingTicket.service.PdfGenerator;
 import ua.logic.bookingTicket.TicketCategory;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.Ticket;
@@ -21,9 +21,11 @@ import java.util.Optional;
 @RequestMapping(value = "/tickets")
 public class TicketController {
     private final TicketService ticketService;
+    private final PdfGenerator pdfGenerator;
 
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, PdfGenerator pdfGenerator) {
         this.ticketService = ticketService;
+        this.pdfGenerator = pdfGenerator;
     }
 
     @GetMapping
@@ -35,7 +37,7 @@ public class TicketController {
     public ResponseEntity<InputStreamResource> getTicketsInPdf() {
         Collection<Ticket> tickets = ticketService.getTickets();
 
-        return PdfGenerator.ticket(tickets);
+        return pdfGenerator.ticket(tickets);
     }
 
     @GetMapping("/{id}")
@@ -51,7 +53,7 @@ public class TicketController {
         Optional<Ticket> ticket = ticketService.getTicket(id);
         ticket.orElseThrow(() -> new TicketNotFoundException(id));
 
-        return PdfGenerator.ticket(Collections.singleton(ticket.get()));
+        return pdfGenerator.ticket(Collections.singleton(ticket.get()));
     }
 
     @GetMapping("/available")
