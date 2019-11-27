@@ -2,23 +2,23 @@ package ua.logic.bookingTicket.repository;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ua.logic.bookingTicket.entity.Ticket;
 import ua.logic.bookingTicket.repository.rowMappers.TicketRowMapper;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Repository
 class DefaultTicketRepository implements TicketRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public DefaultTicketRepository(JdbcTemplate jdbcTemplate) {
+    public DefaultTicketRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     @Override
@@ -42,11 +42,10 @@ class DefaultTicketRepository implements TicketRepository {
     @Override
     @Transactional(readOnly = true)
     public Collection<Ticket> findAll(Collection<String> ids) {
-        List<Ticket> tickets = jdbcTemplate.query("SELECT * FROM ticket", new TicketRowMapper());
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", ids);
 
-        return tickets.stream()//TODO change it for performance
-                .filter(t -> ids.contains(t.getId()))
-                .collect(Collectors.toList());
+        return namedParameterJdbcTemplate.query("SELECT * FROM ticket WHERE id IN (:ids)", parameters, new TicketRowMapper());
     }
 
     @Override
