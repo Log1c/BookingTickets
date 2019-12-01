@@ -76,7 +76,7 @@ public class PdfGenerator {
             PdfPTable table = new PdfPTable(2);
             for (BookedTicket bookedTicket : bookedTickets) {
                 //TODO change it for performance
-                Optional<Ticket> one = ticketRepository.findOne(bookedTicket.getTicketId());
+                Optional<Ticket> one = ticketRepository.findById(bookedTicket.getTicketId());
                 if (!one.isPresent()) {
                     continue;
                 }

@@ -1,17 +1,26 @@
 package ua.logic.bookingTicket.entity;
 
-//import org.springframework.data.annotation.Id;
 import ua.logic.bookingTicket.TicketCategory;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
+@Entity
+@Table(name = "ticket")
 public class Ticket {
-//    @Id
-    private final String id;
+    @Id
+    private String id;
     private String title;
-    private Date date;    // Date when this film is demonstrated
+    private Date date;
     private TicketCategory category;
-    private Integer place; // Place number
+    private Integer place;
+    private boolean deleted;
+
+    @SuppressWarnings("unused") //for JPA
+    public Ticket() {
+    }
 
     public Ticket(String id, String title, Date date, TicketCategory category, Integer place) {
         this.id = id;
@@ -39,5 +48,13 @@ public class Ticket {
 
     public Integer getPlace() {
         return place;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 }

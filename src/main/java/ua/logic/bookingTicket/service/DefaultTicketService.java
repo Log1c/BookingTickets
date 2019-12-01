@@ -11,6 +11,7 @@ import ua.logic.bookingTicket.repository.TicketRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 class DefaultTicketService implements TicketService {
@@ -25,26 +26,28 @@ class DefaultTicketService implements TicketService {
 
     @Override
     public Collection<Ticket> getTickets() {
-        return ticketRepository.findAll();
+        return StreamSupport.stream(ticketRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Ticket> getTicket(String id) {
-        return ticketRepository.findOne(id);
+        return ticketRepository.findById(id);
     }
 
     @Override
     public Collection<Ticket> getTickets(Collection<String> ids) {
-        return ticketRepository.findAll(ids);
+        return StreamSupport.stream(ticketRepository.findAllById(ids).spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Collection<Ticket> getAvailableTickets(TicketFilter filter) {
-        Set<String> ids = bookedTicketRepository.findAll().stream()
+        Set<String> ids = StreamSupport.stream(bookedTicketRepository.findAll().spliterator(), false)
                 .map(BookedTicket::getId)
                 .collect(Collectors.toSet());
 
-        Set<Ticket> tickets = ticketRepository.findAll().stream()
+        Set<Ticket> tickets = StreamSupport.stream(ticketRepository.findAll().spliterator(), false)
                 .filter(t -> !ids.contains(t.getId()))
                 .collect(Collectors.toSet());
 
@@ -80,11 +83,11 @@ class DefaultTicketService implements TicketService {
 
     @Override
     public Collection<BookedTicket> getBookedTickets(String userId, TicketFilter filter) {
-        Set<String> bookedTicketsIds = bookedTicketRepository.findAll().stream()
+        Set<String> bookedTicketsIds = StreamSupport.stream(bookedTicketRepository.findAll().spliterator(), false)
                 .map(BookedTicket::getId)
                 .collect(Collectors.toSet());
 
-        Set<Ticket> tickets = ticketRepository.findAll().stream()
+        Set<Ticket> tickets = StreamSupport.stream(ticketRepository.findAll().spliterator(), false)
                 .filter(t -> bookedTicketsIds.contains(t.getId()))
                 .collect(Collectors.toSet());
 
@@ -93,7 +96,7 @@ class DefaultTicketService implements TicketService {
         Set<String> filteredTicketIds = filteredTickets.map(Ticket::getId)
                 .collect(Collectors.toSet());
 
-        return bookedTicketRepository.findAll().stream()
+        return StreamSupport.stream(bookedTicketRepository.findAll().spliterator(), false)
                 .filter(b -> filteredTicketIds.contains(b.getId()))
                 .filter(b -> b.getUserId().equals(userId))
                 .collect(Collectors.toSet());
@@ -116,7 +119,7 @@ class DefaultTicketService implements TicketService {
                 .map(b -> new BookedTicket(b.getId(), userId, b.getId()))
                 .collect(Collectors.toList());
 
-        bookedTicketRepository.save(result);
+        bookedTicketRepository.saveAll(result);
 
         return result;
     }
