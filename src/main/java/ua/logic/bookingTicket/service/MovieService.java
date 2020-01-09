@@ -23,4 +23,12 @@ public class MovieService {
     public Collection<Movie> findByTitleLike(String title) {
         return movieRepository.findByTitleLike(title);
     }
+
+    public Movie getOrPersistMovie(String title) {
+        Movie movie = movieRepository.findByTitle(title);
+        if (movie == null) {
+            movie = movieRepository.save(new Movie(title));
+        }
+        return movie;
+    }
 }

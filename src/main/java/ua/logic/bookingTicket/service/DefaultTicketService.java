@@ -1,6 +1,5 @@
 package ua.logic.bookingTicket.service;
 
-import org.springframework.stereotype.Service;
 import ua.logic.bookingTicket.TicketFilter;
 import ua.logic.bookingTicket.entity.BookedTicket;
 import ua.logic.bookingTicket.entity.Ticket;
@@ -8,15 +7,17 @@ import ua.logic.bookingTicket.exception.TicketNotFoundException;
 import ua.logic.bookingTicket.repository.BookedTicketRepository;
 import ua.logic.bookingTicket.repository.TicketRepository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@Service
 class DefaultTicketService implements TicketService {
-    private final TicketRepository ticketRepository;
-    private final BookedTicketRepository bookedTicketRepository;
+    protected final TicketRepository ticketRepository;
+    protected final BookedTicketRepository bookedTicketRepository;
 
     DefaultTicketService(TicketRepository ticketRepository,
                          BookedTicketRepository bookedTicketRepository) {

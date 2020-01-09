@@ -7,8 +7,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class Movie {
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
     private String title;
 
@@ -17,9 +16,10 @@ public class Movie {
 
     public Movie(String title) {
         this.title = title;
+        this.id = title;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

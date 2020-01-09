@@ -3,11 +3,13 @@ package ua.logic.bookingTicket.repository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ua.logic.bookingTicket.entity.Movie;
 
 import java.util.Collection;
 
-public interface MovieRepository extends Neo4jRepository<Movie, Long> {
+@Repository
+public interface MovieRepository extends Neo4jRepository<Movie, String> {
     Movie findByTitle(@Param("title") String title);
 
     Collection<Movie> findByTitleLike(@Param("title") String title);
