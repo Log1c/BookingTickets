@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-                sh 'mvn clean package -DskipTests=true'
+                sh 'mvn clean package'
             }
         }
         stage('Unit Tests') {
