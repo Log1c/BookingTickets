@@ -12,7 +12,7 @@ import ua.logic.bookingTicket.entity.User;
 
 import java.util.Collection;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 

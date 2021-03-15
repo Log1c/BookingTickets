@@ -2,9 +2,7 @@ package ua.logic.bookingTicket.controller;
 
 import org.springframework.web.bind.annotation.*;
 import ua.logic.bookingTicket.entity.Movie;
-import ua.logic.bookingTicket.entity.User;
 import ua.logic.bookingTicket.repository.MovieRepository;
-import ua.logic.bookingTicket.repository.UserRepository;
 
 import java.util.Collection;
 
@@ -19,7 +17,6 @@ public class MovieController {
 
     @GetMapping
     public Collection<Movie> getRecommendation(@RequestParam(name = "userName") String userName) {
-        Collection<Movie> recommendation = movieRepository.recommendation(userName);
-        return recommendation;
+        return movieRepository.recommendation(userName);
     }
 }
